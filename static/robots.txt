@@ -1,0 +1,5 @@
+User-agent: *
+Sitemap: http://www.example.com/sitemap.xml
+Disallow: /buscar?
+Disallow: /user/
+Disallow: /download/

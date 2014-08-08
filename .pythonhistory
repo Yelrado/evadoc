@@ -1,0 +1,574 @@
+IS_SLUG('hola_muñdo')
+print IS_SLUG('hola_muñdo')
+print IS_SLUG('hola_muñdo').xml()
+print IS_SLUG()('hola muñdo')
+print IS_SLUG()('hola muñdo')[0]
+print IS_SLUG()('hola muñdo/-abc')[0]
+db = DAL('sqlite://storage.sqlite')
+db.define_table('persona', Field('nombre'), Field('slug', requires=IS_SLUG()))
+db.persona.insert(nombre='Pepe el ñoño')
+print db.persona[1]
+db.persona.drop()
+db.define_table('persona', Field('nombre, requires=IS_SLUG()))
+db.define_table('persona', Field('nombre, requires=IS_SLUG())
+db.define_table('persona', Field('nombre', requires=IS_SLUG()))
+db.persona.insert(nombre='Pepe el ñoño')
+print db.persona[1]
+print db.persona[1].nombre
+db.persona.drop()
+db.define_table('profesor', Field('nombre'), Field('slug', compute=lambda r: IS_SLUG()(r.nombre)[0]))
+db.profesor.insert(nombre='Pepito el ñoño')
+print db.profesor[1]
+print db.profesor[1].slug
+db.profesor.drop()
+db.define_table('profesor', Field('nombre'), Field('slug', compute=lambda r: IS_SLUG()(r.nombre + '-' + r.id)[0]))
+db.profesor.insert(nombre='José Perez León')
+slug = db.profesor[1].slug
+print slug
+print db.profesor(1)
+exit()
+type(db)
+db.define_table('profesor', Field('nombre'))
+db = DAL('sqlite://storage.sqlite')
+db.define_table('profesor', Field('nombre'))
+db.profesor.insert(nombre='Jose')
+db.profesor.insert(nombre='Juan')
+print db().select(db.profesor.ALL)
+print db().select(db.profesor.ALL, orderby='<random>', limitby(0,1))
+print db().select(db.profesor.ALL, orderby='<random>', limitby=(0,1))
+print db().select(db.profesor.ALL, orderby='<random>', limitby=(0,2))
+print db().select(db.profesor.ALL, orderby='<random>', limitby=(0,6))
+db(db.profesor).count()
+exit()
+type(db)
+from gluon.contrib.populate import populate
+populate(db.dependencia, 10)
+print db.dependencia(id>0)
+print db.dependencia(id>0).select()
+print db(db.dependencia>0).select()
+print db(db.dependencia.id>0).select()
+populate(db.profesor, 100)
+print db(db.profesor).select()
+print db.profesor(57).slug
+exit()
+print auth.user
+print auth.user_id
+db(db.auth_user).select()
+r = db.auth_user(auth.user_id)
+type(r)
+db.auth_user(auth.user_id).facultad
+db.auth_user[auth.user_id]
+db.auth_user[auth.user_id].facultad
+exit()
+db(db.profesor.id==3).select().first()
+db(db.profesor.id==37655).select().first()
+r = db(db.profesor.id==37655).select().first()
+print r
+db.auth_user(1)
+auth_user(1).facultad
+db.auth_user(1).facultad
+db.auth_user(1).facultad.nombre
+exit()
+index()
+print session.facultad
+exit()
+BEAUTIFY(dict(bla='jiji'))
+BEAUTIFY(dict(bla='jiji')).xml()
+exit()
+type(db.auth_user(auth.user_id).facultad)
+type(db.auth_user(auth.user_id))
+if (db.auth_user(auth.user_id)):
+    
+    pass
+if (db.auth_user(auth.user_id)):
+    print algo
+if (db.auth_user(auth.user_id)):
+    print algo
+else:
+    print nosta
+type(SQLFORM())
+type(SQLFORM(db.auth_user))
+type('ho')
+SQLFORM.__class__()
+SQLFORM.__class__
+isinstance(SQLFORM(db.auth_user),gluon.sqlhtml.SQLFORM)
+isinstance(SQLFORM(db.auth_user),SQLFORM)
+a = True
+print a
+del a
+print a
+URL('profesor')
+u = URL('profesor')
+str(u)
+u._args['1']
+u.args['1']
+u = URL('profesor', args=1)
+print u
+db.evaluacion
+db(db.evaluacion).select()
+import from gluon.contrib.populate import populate
+from gluon.contrib.populate import populate
+populate(db.evaluacion, 10)
+db(db.evaluacion).select()
+print db(db.evaluacion).select()
+print db(db.evaluacion).select()[0]
+print db(db.evaluacion).select()[0].recomendable == True
+print db(db.evaluacion).select()[0].recomendable == False
+db((db.evaluacion.evaluado == 1) & (db.evaluacion.recomendable == True)).count()
+db((db.evaluacion.evaluado == 1) & (db.evaluacion.recomendable == False)).count()
+print db(db.evaluacion.evaluado == 1).select()
+print db(db.evaluacion).select()
+print db(db.evaluacion.evaluado == 19).select()
+db((db.evaluacion.evaluado == 19) & (db.evaluacion.recomendable == True)).count()
+db((db.evaluacion.evaluado == 19) & (db.evaluacion.recomendable == False)).count()
+db((db.evaluacion.evaluado == 93) & (db.evaluacion.recomendable == False)).count()
+db((db.evaluacion.evaluado == 93) & (db.evaluacion.recomendable == True)).count()
+db.profesor.comentarios = Field.Virtual(lambda r: db(db.evaluacion.evaluado == r.id).count())
+db.profesor[1]
+db.profesor[1].comentarios
+f = Field.Virtual(lambda r: db(db.evaluacion.evaluado == r.id).count())
+type(f)
+db.profesor.comentarios = f
+type(db.profesor.comentarios)
+db(db.profesor).select()
+db(db.profesor).select()[0].comentarios
+db(db.profesor).select()[0]
+for registro in db(db.profesor).select(): print registro.comentarios
+class MisCampos(object):
+    def comentarios(
+exit()
+class MisCamposVirtuales(object):
+    def comentarios(self):
+        return db(db.evaluacion.evaluado == self.profesor.id).count()
+db.profesor.virtualfields.append(MisCamposVirtuales())
+db.profesor[1]
+db.profesor[19]
+def hola:
+def hola():
+    class Mundo(object):
+        def saludo(self):
+            print 'hola mundo'
+    m = Mundo()
+    m.saludo()
+hola()
+request.user_agent()
+request.user_agent()['is_mobile']
+request.user_agent().is_mobile
+db.profesor.facultad == 1
+from gluon.contrib.populate import populate
+populate(db.profesor, 1000)
+populate(db.evaluacion, 10000)
+exit()
+limitby = (pagina * elementos_por_pagina,
+               (pagina + 1) * elementos_por_pagina + 1)
+    profesores = db(db.profesor.facultad == id_facultad).select(
+      db.profesor.id, db.profesor.nombre, db.profesor.foto, db.profesor.slug,
+profesores=db(db.profesor.facultad == 19).select(db.profesor.ALL, orderby=db.profesor.nombre)
+class Campos(object):
+    def comentarios(self):
+        return db(db.evaluacion.evaluado == self.profesor.id).count()
+profesores.setvirtualfields(extra=Campos())
+print db.profesor.extra
+print profesores.extra
+print profesores.comentarios
+print profesores
+print profesores.extra
+type(profesores)
+print profesores[0]
+profesores=db(db.profesor.facultad == 1).select(db.profesor.ALL, orderby=db.profesor.nombre)
+print profesores
+print profesores[0]
+print profesores[0].extra
+print profesores[0].comentarios
+print profesores[0].comentario
+type(profesores)
+print profesores.__len__
+db(profesores).select()
+profesores.db().select()
+comentarios = db.profesor.id.count()
+print comentarios
+type(comentarios)
+registros = db(db.profesor.id==db.evaluacion.evaluado).select(db.profesor.nombre, comentarios, groupby=db.persona.nombre)
+registros = db(db.profesor.id==db.evaluacion.evaluado).select(db.profesor.nombre, comentarios, groupby=db.profesor.nombre)
+print registros[0]
+print registros[1]
+r registro[1]
+r = registro[1]
+print  registro[1]
+r = registros[1]
+type(r)
+r.profesor.nombre
+r._extra.COUNT(profesor.id)
+r.row['COUNT(profesor.id)']
+r['COUNT(profesor.id)']
+profesores
+profesores.sort(lambda r: r.id)
+profesores.sort(lambda r: r.id)[0]
+profesores[0]
+print db.evaluacion.fields
+db.evaluacion.insert(recomendable=True,evaluado=560,evaluador=1)
+db.evaluacion.insert(recomendable=True,evaluado=143,evaluador=1)
+exit()
+print db.profesor.fields
+db.profesor.insert(id=10,nombre='Joaquin',facultad=1)
+db.commit()
+db.nota_evaluacion(
+)
+print db.nota_evaluacion
+print db.nota_evaluacion.id
+print db.nota_evaluacion.count()
+print db.auth_user.fields
+db.auth_user.insert(id=1, first_name='anon', anonimo=True)
+print db.auth_user(1)
+exit()
+print db.evaluacion.fields(
+)
+db.evaluacion.insert(recomendable=False,evento='noshe',evaluado=3)
+db.commit()
+db.evaluacion.insert(recomendable=True,evento='noshe',evaluado=3)
+db.commit()
+db.evaluacion.insert(recomendable=False,evento='noshe',evaluado=2)
+db.commit()
+db.evaluacion.insert(recomendable=False,evento='noshe',evaluado=2)
+db.commit()
+db((db.profesor.id == db.evaluacion.evaluado) & (db.profesor.facultad == 1)).select(db.profesor.ALL, orderby=db.profesor.nombre)
+registros = db((db.profesor.id == db.evaluacion.evaluado) & (db.profesor.facultad == 1)).select(db.profesor.ALL, orderby=db.profesor.nombre)
+print len(registros)
+print registros
+conteo = db.profesor.id.count()
+registros = db((db.profesor.id == db.evaluacion.evaluado) & (db.profesor.facultad == 1)).select(db.profesor.ALL, conteo, orderby=db.profesor.nombre)
+print registros
+for registro in db((db.profesor.id == db.evaluacion.evaluado) & (db.profesor.facultad == 1)).select(db.profesor.ALL, conteo, orderby=db.profesor.nombre): print registro.profesor.nombre, registro[conteo]
+print db(db.profesor).select()
+print db(db.profesor.slug == 'jiraming').select()
+print db(db.profesor.slug == 'jiraming0').select()
+print db(db.profesor.slug == 'jiramingo').select()
+print db(db.profesor.slug == 'jiramingo').count()
+print db(db.profesor.slug == 'jiramio').count()
+if 0:
+    print 'si'
+else:
+    print 'no'
+print db(db.profesor.slug == 'jiramingo').select().first()
+print db(db.profesor.slug == 'jiramingso').select().first()
+print 'hoola' + 'mundo'
+print len(None)
+'hola amigos'.title()
+exit()
+db.auth_user(auth.user_id).facultad
+if db.auth_user(auth.user_id).facultad:
+    print 'si'
+try:
+    db.auth_user(auth.user_id).facultad
+except Exception, e:
+    print 'epa: %s' % e
+else:
+auth.user_id
+print auth.user_id
+request.vars
+request.args
+print 'hola' if 1
+print 'hola' if 1 else print 'no'
+print db.profesor.fields(
+)
+print db.evaluacion.fields
+exit()
+f1 = SQLFORM(db.profesor)
+type(f1)
+f2 = SQLFORM.factory(Field(nombre))
+f2 = SQLFORM.factory(Field('nombre'))
+type(f2)
+print f2.widgets
+print f1.nombre
+print f1
+html = TAG('<a>xxx</a><b>yyy</b>)
+html = TAG('<a>xxx</a><b>yyy</b>')
+for item in html.components:print item
+for item in f1.components:print item
+for item in f2.components:print item
+f1.element
+f2.element('.string')
+print f2.element('.string')
+e = f2.element('.string')
+print e.tag
+e['_class'] = 'string search-input'
+print e
+exit()
+a = A('hola', _href='#')
+print a
+print a.attributes
+print a.components
+a.components[0]
+a.components[0] = 'hello'
+print a
+a = SQLFORM.widgets.autocomplete(request,db.profesor.nombre,limitby=(0,10),min_length=2)
+print a
+a.fields
+print a.custom.label['nombre']
+form = SQLFORM.factory(Field('buscar',widget=a))
+print form.custom.label['buscar']
+print form.custom.inpval['buscar']
+print form.custom.dspval['buscar']
+form.custom.item['buscar']
+print form.custom
+print form.custom.widget['buscar']
+form.custom.widget['buscar'].xml()
+form.custom.widget['buscar']['_class']
+print form.custom.widget['buscar']['_class']
+print form.custom.widget['buscar']._class
+print form.custom.widget['buscar'].class
+print form.custom.widget.buscar['_class']
+w = form.custom.widget.buscar
+w[_class]
+w['_class'] = 'SUPERCLASE'
+print form
+form.custom.widget.buscar['_class'] = 'SUPERCLASE'
+print form
+print form.custom.widget.buscar
+print form.custom.widget.buscar['_class']
+print form.custom.widget.buscar
+print form.custom.widget.buscar.as_dict()
+print form.custom.widget.buscar.update(_class='MEGAMEGAXXX')
+a = form.custom.widget.buscar.update(_class='MEGAMEGAXXX')
+print a
+print form
+print form.custom.buscar
+print form.custom.widget
+print form.custom.end
+print form.custom.begin
+print form.custom['_formname']
+print form.custom.widget
+print form.custom
+exit()
+form = auth.login()
+print form
+form.formstyle("divs")
+form.formstyle = 'divs'
+print form
+exit()
+db.profesor(db.profesor.facultad == 1).select()
+db(db.profesor.facultad == 1).select()
+profesores = db(db.profesor.facultad == 1).select()
+print profesores
+profesores[0].nombre
+profesores = db((db.profesor.facultad == 1) & (db.profesor.id == db.evaluacion.evaluado).select()
+profesores = db((db.profesor.facultad == 1) & (db.profesor.id == db.evaluacion.evaluado)).select()
+print profesores
+profesores = db().select(
+db.profesores.ALL, db.evaluacion.ALL,
+left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+profesores = db().select(db.profesor.ALL,db.evaluacion.ALL,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+print profesores
+print profesores[-1]
+print profesores[0]
+print profesores.find(lambda r:r.recomendable==True)
+print profesores.find(lambda r:r.evaluacion.recomendable==True)
+print profesores.find(lambda r:r.evaluacion.recomendable==False)
+profesores = db(db.profesor.facultad == 5).select(db.profesor.ALL,db.evaluacion.ALL,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+print profesores
+profesores = db(db.profesor.facultad == 1).select(db.profesor.ALL,db.evaluacion.ALL,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+print profesores
+print len(profesores)
+profesores = db(db.profesor.facultad == 1).select(db.profesor.ALL,db.evaluacion.ALL,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+print len(profesores.find(lambda r:r.evaluacion.recomendable == True))
+print len(profesores.find(lambda r:r.evaluacion.recomendable == False))
+print len(profesores.find(lambda r:(r.evaluacion.recomendable == False) & (r.profesor.id == 3)))
+print len(profesores.find(lambda r:(r.evaluacion.recomendable == True) & (r.profesor.id == 3)))
+print len(profesores.find(lambda r:(r.evaluacion.recomendable == True) & (r.profesor.id == 2)))
+print len(profesores.find(lambda r:(r.evaluacion.recomendable == False) & (r.profesor.id == 3)))
+conteo = db.profesor.id
+print conteo
+profesores = db(db.profesor.facultad == 1).select(db.profesor.ALL,db.evaluacion.ALL,conteo,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado), groupby=db.evaluacion.evaluado)
+profesores[0]
+conteo
+print conteo
+conteo = db.profesor.id.count()
+print conteo
+profesores = db(db.profesor.facultad == 1).select(db.profesor.ALL,db.evaluacion.ALL,conteo,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado), groupby=db.evaluacion.evaluado)
+print profesores[0]
+print profesores
+print profesores[0]
+profesores = db(db.profesor.facultad == 1).select(db.profesor.ALL,db.evaluacion.ALL,conteo,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado), groupby=db.evaluacion.evaluado)
+print profesores[0]
+profesores = db().select(db.profesor.ALL,db.evaluacion.ALL,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+print profesores.colnames
+profesores = db().select(db.profesor.ALL,db.evaluacion.recomendable,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+print profesores.colnames
+mejores = profesores.find(lambda r:(r.evaluacion.recomendable==True) & (r.profesor.id==3))
+print mejores
+print len(mejores)
+mejores = profesores.find(lambda r:(r.evaluacion.recomendable==True) & (r.profesor.id==5))
+print len(mejores)
+mejores = profesores.find(lambda r:(r.evaluacion.recomendable==True))
+len(mejores)
+print mejores
+profesores
+print profesores
+profesores.find(lambda r:r.profesor.id==r.evaluacion.evaluado)
+profesores = db().select(db.profesor.ALL,db.evaluacion.evaluado,db.evaluacion.recomendable,left=db.evaluacion.on(db.profesor.id==db.evaluacion.evaluado))
+profesores.find(lambda r:r.profesor.id==r.evaluacion.evaluado)
+print profesores.find(lambda r:r.profesor.id==r.evaluacion.evaluado)
+db(db.evaluacion.evaluado == 3).count()
+db((db.evaluacion.evaluado == 3)&(db.evaluacion.recomendable==True)).count()
+db((db.evaluacion.evaluado == 3)&(db.evaluacion.recomendable==False)).count()
+db((db.evaluacion.evaluado == 5)&(db.evaluacion.recomendable==False)).count()
+db((db.evaluacion.evaluado == 5)&(db.evaluacion.recomendable==True)).count()
+db((db.evaluacion.evaluado == 5)).count()
+exit()
+form = SQLFORM(db.evaluacion, record_id=3)
+print form
+print form.custom.widget.evaluado
+print form.custom.widget.evaluado.components
+print form.custom.widget.evaluado.components[0]
+print form.custom.widget.evaluado.components[1]
+print form.custom.widget.evaluado.components[2]
+print form.custom.widget.evaluado.components[3]
+print form.custom.widget.modificado_en.components[0]
+print form.custom.widget.modificado_en.components
+print form.custom.widget.evento.components[0]
+print form.custom.widget.evento
+print form.custom.widget.comentario
+form = SQLFORM(db.evaluacion, record_id=12)
+print form.custom.widget.id
+print form.custom.widget.evento
+print form.custom.dspval.evento
+print form.custom.dspval.comentario
+print form.custom.inpval.comentario
+print form.custom.inpval.evento
+form = SQLFORM(db.evaluacion, 12)
+print form.custom.inpval.evento
+print form.custom.inpval.comentario
+form = SQLFORM(db.evaluacion, None)
+print form.custom.inpval.comentario
+print form.custom.inpval.evento
+None or None
+print None or None
+a = None or None
+print a
+a = None or 1
+print a
+a = 'sadf' or None
+print a
+db(db.evaluacion.evaluador==2).select().first()
+comentario = db(db.evaluacion.evaluador==2).select().first()
+print comentario.id
+comentario = db(db.evaluacion.evaluador==50).select().first()
+print comentario.id
+print comentario
+print comentario.id
+print comentario.id or None
+print comentario.id if comentario or None
+print comentario.id if comentario else None
+print form.custom.inpval.evento
+form = SQLFORM(db.evaluacion, 12)
+print form.custom.inpval.evento
+print form.custom.inpval.comentario
+print form.custom.dspval.comentario
+print form.custom.dspval.evento
+form = SQLFORM(db.evaluacion, None)
+print form.custom.dspval.evento
+print form.custom.inpval.evento
+len(form.custom.inpval.evento)
+rj is None
+print form.hidden_fields()
+None != -1
+a = Storage()
+import gluon.storage from Storage
+from gluon.storage import Storage
+a = Storage()
+print a
+a.algo.append(1)
+a.algo = dict()
+a.algo.append(1)
+a.algo.insert(1)
+a.algo = ()
+a.algo.insert(1)
+a.algo = []
+a.algo.insert(1)
+a.algo.append(1)
+print a.algo
+a.algo.append(1)
+print a.algo
+a.array = ]
+a.arreglo = []
+a.arreglo
+a.arreglo is None
+a.jsadsf is None
+db(db.evaluacion.evaluador==2).select().first()
+db(db.evaluacion.evaluador==29).select().first()
+db(db.evaluacion.evaluador==29).select().first() is None
+print TAG['small']('hola mundo')
+db(db.evaluacion.evaluador==29).count()
+db(db.evaluacion.evaluador==2).count()
+db(db.evaluacion.evaluador==2).select()
+db(db.evaluacion.evaluador==2).select().find(lambda r: r.evaluador==2)
+db(db.evaluacion.evaluador==2).select().find(lambda r: r.evaluador==2).count()
+len(db(db.evaluacion.evaluador==2).select().find(lambda r: r.evaluador==2))
+exit()
+''.join('hola').join('mundo')
+''.join('hola')
+request.a
+request.b
+exit()
+0 is None
+0 is true
+0 is True
+1 is True
+a = 4
+inc(a)
+a++
+a+=1
+print a
+num = int('5')
+print num
+exit()
+rws = db((db.nota_evaluacion.id==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento.db.evaluacion.comentario,groupby=db.nota_evaluacion.id)
+rws
+rws = db((db.nota_evaluacion.id==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento.db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.nota_evaluacion.id)
+rws
+rws = db((db.nota_evaluacion.id==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento.db.evaluacion.comentario,db.evaluacion.id.count())
+rws
+print rws
+db(db.nota_evaluacion.nota=='megusta').select()
+print db(db.nota_evaluacion.nota=='megusta').select()
+print db((db.nota_evaluacion.nota=='megusta')&(db.nota_evaluacion.id==db.evaluacion.id)).select()
+print db((db.nota_evaluacion.id==db.evaluacion.id)).select()
+print db((db.nota_evaluacion.id==db.evaluacion.id)).count()
+print db((db.nota_evaluacion.nota=='megusta')&(db.nota_evaluacion.id==db.evaluacion.id)).count()
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento.db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.nota_evaluacion.id)
+rws
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.nota_evaluacion.id)
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.nota_evaluacion.id)
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.evaluacion.id)
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.evaluacion.id,orderby=db.evaluacion.id.count())
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.evaluacion.id,orderby=~db.evaluacion.id.count())
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,db.evaluacion.id.count(),groupby=db.evaluacion.id,orderby=~db.evaluacion.id.count())
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,groupby=db.evaluacion.id,orderby=~db.evaluacion.id.count())
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,groupby=db.evaluacion.id,orderby=db.evaluacion.id.count())
+print rws
+rws = db(db.profesor.id ==2).select()
+class Campo(object):
+    def comentario(self):
+class Campo(object):
+    def nota(self,nota):
+        return db(db.nota_evaluacion==nota).select().first()
+rws.addvirtualfields(extra=Campo())
+rws.setvirtualfields(extra=Campo())
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta')).select(db.evaluacion.evento,db.evaluacion.comentario,groupby=db.evaluacion.id,orderby=db.evaluacion.id.count())
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta') & (db.evaluacion.recomendable==True)).select(db.evaluacion.evento,db.evaluacion.comentario,groupby=db.evaluacion.id,orderby=db.evaluacion.id.count())
+print rws
+rws = db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) & (db.evaluacion.evaluado==2) & (db.nota_evaluacion.nota=='megusta') & (db.evaluacion.recomendable==False)).select(db.evaluacion.evento,db.evaluacion.comentario,groupby=db.evaluacion.id,orderby=db.evaluacion.id.count())
+print rws
+exit()
+db.profesor.truncate()
+db.commit()
+exit()

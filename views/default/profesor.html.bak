@@ -1,0 +1,182 @@
+{{extend 'layout.html'}}
+<div class="row-fluid" style="padding-bottom:15px;">
+    <div class="row-fluid">
+    <img class="span4 offset1 img-rounded lazy" src="{{=URL('download',args=profesor.profesor.foto)}}" alt="{{=profesor.profesor.nombre}}" />
+    <div class="caption span6" >
+        <h1 class="text-center">{{=profesor.profesor.nombre.title()}}<a href="{{=URL('profesor',args=profesor.profesor.slug)}}" rel="tooltip" data-toggle="tooltip" title="Enlace permanente"><i class="icon-share"></i></a></h1>
+        <h2 class="text-center text-info">{{=profesor.profesor.facultad.nombre}}</h2>
+        <h3 class="text-center muted">{{=response.universidad}}</h3>
+            {{
+            if profesor.conteo.comentarios:
+                total = profesor.conteo.comentarios #100%
+                positivos = profesor.conteo.recomendaciones * 100.0 / profesor.conteo.comentarios
+                negativos = (profesor.conteo.comentarios - profesor.conteo.recomendaciones) * 100.0 / profesor.conteo.comentarios
+            }}
+        <div class="progress progress-striped" style="height: 35px;">
+            <div class="bar bar-success" style="width: {{='%.5f' % positivos}}%;"></div>
+            <div class="bar bar-danger" style="width: {{='%.5f' % negativos}}%;"></div>
+        </div>
+        <div class="well well-small text-center">
+            <span class="badge badge-{{='success' if positivos > 50 else 'important'}}">{{='%.2f' % positivos}}%</span> de recomendaciones en <span class="badge badge-info">{{=total}}</span> revisiones
+        </div>
+            {{pass}}
+        <div class="row-fluid">
+            <button id="recomendable" onclick="mostrar_formulario(true);" class="btn btn-default btn-success pull-left" type="button"><i class="icon-ok-sign icon-white"></i> Recomendable</button>
+            <button id="indigno" onclick="mostrar_formulario(false);" class="btn btn-default btn-danger pull-right" type="button"><i class="icon-remove-sign icon-white"></i> Desaprobado</button>
+        </div>
+    </div>
+    </div>
+    <div class="row-fluid">
+        <div id="formulario" class="span5 well well-small hidden">
+        {{=form.custom.begin}}<!-- formulario -->
+            <fielset>
+                {{if not id_registro:}}
+                <legend>Haz tu reseña</legend>
+                {{else:}}
+                <legend>Actualiza tu reseña</legend>
+                <p>Puedes alternar entre <span class="label label-success">Recomendable</span> y <span class="label label-important">Desaprobado</span> dando clic el botón correspondiente. Cuando cambias tu reseña los «Me gusta» e «Inapropiado» se ponen en cero.</p>
+                {{pass}}
+                <div class="control-group">
+                    <label class="control-label" for="inputEvento">Materia o evento:</label>
+                    <div class="controls">
+                        <input class="string input-block-level" id="inputEvento" type="text" name="evento" autocomplete="off" placeholder="Matemáticas I, Inglés, Tutoria o Seminario" value="{{=form.custom.inpval.evento or form.vars.evento or ''}}" />
+                        {{if form.errors['evento']:}}
+                        <div class="error">{{=form.errors['evento']}}</div>
+                        {{pass}}
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="inputComentario">Comentario:</label>
+                    <div class="controls">
+                        <textarea class="text input-block-level" id="inputComentario" name="comentario" rows="5" placeholder="Describe porqué recomiendas o desapruebas a este profesor.">{{=form.custom.inpval.comentario or form.vars.comentario or ''}}</textarea>
+                        {{if form.errors['comentario']:}}
+                        <div class="error">{{=form.errors['comentario']}}</div>
+                        {{pass}}
+                    </div>
+                </div>
+                <small>Al dar clic en «Enviar» asumes la responsabilidad total de tu opinión. Tus datos de registro son <em>completamente anónimos</em> y <em>confidenciales</em>, <strong>nunca</strong> los compartiremos con <strong>nadie</strong><i class="icon-lock"></i>.</small>
+                <div class="control-group">
+                    <div class="controls">
+                        <span onclick="jQuery('#formulario').css('display','none');" class="btn">Cancelar</span>
+                        <button class="btn btn-primary">Enviar</button>
+                    </div>
+                </div>
+                <input id="recomendable" name="recomendable" value="" type="hidden" /><!-- value="x" = True value="" = False -->
+                <input name="evaluado" value="{{=profesor.profesor.id}}" type="hidden" />
+                {{=form.custom.delete}}
+                {{=form.hidden_fields()}}
+            </fielset>
+        </form><!-- end formulario -->
+        </div>
+    </div>
+</div>
+{{def javascript(nota,actual):}}
+    {{if not auth.is_logged_in():}}
+registrarse('{{=r.evaluacion.id}}');
+    {{else:}}
+        {{if r.evaluacion.id == id_registro:}}
+jQuery('.flash').html('¡{{=auth.user.first_name}} eres genial! :D').slideDown().delay(250).slideUp();
+	    {{else:}}
+{{
+if nota=='megusta':
+    clase='badge badge-important'
+elif nota=='inapropiado':
+    clase='badge badge-inverse'
+pass
+}}
+agregar_nota({{=r.evaluacion.id}}, '{{=nota}}','#cuantos_{{=nota}}{{=r.evaluacion.id}}', '{{=clase}}');
+        {{pass}}
+    {{pass}}
+{{return}}
+
+{{def comentario(tipo,fondo):
+# .positivo|.negativo
+# tipo=True|False#positivo ó negativo
+}}
+<div id="evaluacion{{=r.evaluacion.id}}" class="row-fluid">
+    <div class="span12 well {{=fondo}}" >
+        <h4>{{=r.evaluacion.evento}} <a href="#evaluacion{{=r.evaluacion.id}}" rel="tooltip" title="Enlace a este comentario"><i class="icon-share"></i></a><span class="label label-warning pull-right">{{='Este es tu comentario' if r.evaluacion.id == id_registro else ''}}</span></h4>
+        <hr>
+        <p>{{=r.evaluacion.comentario}}</p>
+        <p class="label pull-left" rel="tooltiptime" title="{{=r.evaluacion.modificado_en}}"><i class="icon-time icon-white"></i> {{=prettydate(r.evaluacion.modificado_en,T)}}</p>
+        <ul class="inline pull-right">
+        {{if r.evaluacion.id == id_registro:}}
+            <li class="badge badge-info"><a href="#formulario" onclick="mostrar_formulario({{='true' if tipo else 'false'}})"><i class="icon-edit icon-white" rel="tooltip" title="Editar"></i></a></li>
+            <li class="divide"></li>
+        {{pass}}
+            <li class="badge badge-{{='warning' if r.notas.tiene_megusta else 'important'}}" id="megusta{{=r.evaluacion.id}}" rel="tooltip" title="Me gusta" onclick="{{javascript('megusta',r.notas.cuantos_megusta)}}">
+                <span id="cuantos_megusta{{=r.evaluacion.id}}">{{=r.notas.cuantos_megusta}}</span>
+                <i class="icon-heart icon-white"></i>
+            </li>
+            <li class="divide"></li>
+            <li class="badge badge-{{='warning' if r.notas.tiene_inapropiado else 'inverse'}}" id="inapropiado{{=r.evaluacion.id}}" rel="tooltip" title="Denunciar como inapropiado" onclick="{{javascript('inapropiado',r.notas.cuantos_inapropiado)}}">
+                <span id="cuantos_inapropiado{{=r.evaluacion.id}}">{{=r.notas.cuantos_inapropiado}}</span>
+                <i class="icon-flag icon-white"></i>
+            </li>
+        </ul>
+    </div>
+</div>
+{{return}}
+<div class="row-fluid"><!-- comentarios -->
+    <div class="span5 offset1"><!-- positivos -->
+        {{if not comentarios_positivos:}}
+        <div class="row-fluid">
+            <div class="span12 well" style="background-color: rgba(98, 196, 98, 0.2);" >
+            <p class="lead">
+                Aún sin recomendaciones
+            </p>
+            </div>
+        </div>
+        {{pass}}
+        {{for r in comentarios_positivos:}}
+            {{comentario(True,'positivo')}}
+        {{pass}}
+    </div><!-- end positivos -->
+    <div class="span5"><!--negativos-->
+        {{if not comentarios_negativos:}}
+        <div class="row-fluid" >
+            <div class="span12 well" style="background-color: rgba(238, 95, 91, 0.2);" >
+            <p class="lead">
+                {{='Ni ' if not comentarios_positivos else 'No hay '}}
+                desaprobaciones
+            </p>
+            </div>
+        </div>
+        {{pass}}
+        {{for r in comentarios_negativos:}}
+            {{comentario(False,'negativo')}}
+        {{pass}}
+    </div><!-- end negativos -->
+</div><!-- end comentarios -->
+<form>
+    <input type="hidden" id="nota" name="nota" value="" />
+    <input type="hidden" id="id_evaluacion" name="id_evaluacion" value="" />
+    <input type="hidden" id="actual" name="actual" value="" />
+    <input type="hidden" id="clase" name="clase" value="" />
+</form>
+{{block javascript}}
+<script src="{{=URL('static','js/evadoc.js')}}"></script>
+<script type="text/javascript">
+    jQuery(document).ready(function(){
+        {{if form.errors:}}
+        mostrar_formulario({{='true' if request.vars.recomendable else 'false'}});
+        {{pass}}
+        $("[rel=tooltip]").tooltip();
+        $("[rel=tooltiptime]").tooltip({
+            placement: 'right';
+        });
+    });
+    function agregar_nota(id_evaluacion, nota, elemento, clase) {
+        jQuery('input#nota').val(nota);
+        jQuery('input#id_evaluacion').val(id_evaluacion);
+        var actual = jQuery(elemento).html();
+        jQuery('input#actual').val(actual);
+        jQuery('input#clase').val(clase);
+        ajax('{{=URL("ajax","agregar_nota")}}', ['nota','id_evaluacion','actual','clase'], ':eval');
+    }
+    function registrarse(id) {
+        var html = '<a href={{=URL('user',args='register',vars=dict(_next=URL(args=request.args)))}}%23evaluacion'+id+'>Registrate</a> para poder votar las revisiones'
+        jQuery(".flash").html(html).slideDown().delay(5000).slideUp();
+    }
+</script>
+{{end}}

@@ -1,0 +1,40 @@
+# coding: utf8
+
+# formulario buscador
+form_buscar = SQLFORM.factory(
+  Field('buscar',
+    requires=[IS_NOT_EMPTY(), IS_LENGTH(minsize=4,
+      error_message='Prueba con un nombre más largo')]),
+  _class='navbar-search pull-right',
+  formstyle='divs')
+input = form_buscar.element('.string')
+input['_class'] = 'string search-query typeahead'
+input['_id'] = 'buscador'
+input['_autocomplete'] = 'off'
+input['_placeholder'] = 'Buscar'
+response.form_buscar = form_buscar
+if response.form_buscar.validate(formname='buscador'):
+    redirect(URL('buscar', vars=dict(q=str(form_buscar.vars.buscar))))
+
+# formulario seleccionar facultad
+if not auth.is_logged_in() and not session.id_facultad:
+    form_facultad = SQLFORM.factory(Field('facultad',
+      requires=IS_IN_DB(db, 'dependencia.id', '%(nombre)s',
+                        zero='Elige tu facultad',
+                        error_message='Necesitas elegir una facultad')),
+                                 formstyle='divs')
+    form_facultad.vars.facultad = session.id_facultad
+    response.form_facultad = form_facultad
+    if form_facultad.validate(formname='form_facultad'):
+        session.id_facultad = form_facultad.vars.facultad
+        response.flash = 'Redirigiendo a la pasarela'
+        redirect(URL('pasarela'))
+    elif form_facultad.errors:
+        response.flash = 'Hubo un error al elegir tu facultad'
+
+
+def borrar_session():
+    if not URL.verify(request, hmac_key=KEY): raise HTTP(403)
+    session.clear()
+    session.olvidado = True
+    redirect(URL('default','index'))

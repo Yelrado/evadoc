@@ -1,0 +1,37 @@
+/*index.html */
+#owl-profesores .item{
+    margin: 8px;
+}
+#owl-profesores .item img{
+    display: block;
+    width: 100%;
+}
+
+.owl-theme .owl-controls .owl-buttons div {
+    position: absolute;
+}
+
+.owl-theme .owl-controls .owl-buttons .owl-prev{
+    left: -45px;
+    top: 55px;
+}
+
+.owl-theme .owl-controls .owl-buttons .owl-next{
+    right: -45px;
+    top: 55px;
+}
+/*pasarela.html y profesor.html*/
+.affix-bottom {
+  width: inherit;
+  position: absolute;
+  top: auto;
+  bottom: 200px;  /*height of the footer*/
+}
+.positivo {
+    background-color: rgba(98, 196, 98, 0.2);
+    margin: 0px;
+}
+.negativo {
+    background-color: rgba(238, 95, 91, 0.2);
+    margin: 0px;
+}

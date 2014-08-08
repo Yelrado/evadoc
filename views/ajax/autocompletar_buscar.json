@@ -1,0 +1,10 @@
+[
+{{
+if profesores:
+    for profesor in profesores[:-1]:
+}}
+        "{{=profesor.nombre}}",
+        {{pass}}
+    "{{=profesores[-1].nombre}}"
+    {{pass}}
+]

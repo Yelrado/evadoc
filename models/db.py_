@@ -1,0 +1,202 @@
+# -*- coding: utf-8 -*-
+
+#########################################################################
+## This scaffolding model makes your app work on Google App Engine too
+## File is released under public domain and you can use without limitations
+#########################################################################
+
+## if SSL/HTTPS is properly configured and you want all HTTP requests to
+## be redirected to HTTPS, uncomment the line below:
+# request.requires_https()
+
+if not request.env.web2py_runtime_gae:
+    ## if NOT running on Google App Engine use SQLite or other DB
+    db = DAL('sqlite://storage.sqlite',pool_size=10,migrate=False)
+else:
+    ## connect to Google BigTable (optional 'google:datastore://namespace')
+    db = DAL('google:datastore')
+    ## store sessions and tickets there
+    session.connect(request, response, db=db)
+    ## or store session in Memcache, Redis, etc.
+    ## from gluon.contrib.memdb import MEMDB
+    ## from google.appengine.api.memcache import Client
+    ## session.connect(request, response, db = MEMDB(Client()))
+
+## by default give a view/generic.extension to all actions from localhost
+## none otherwise. a pattern can be 'controller/function.extension'
+response.generic_patterns = ['*'] if request.is_local else []
+## (optional) optimize handling of static files
+# response.optimize_css = 'concat,minify,inline'
+# response.optimize_js = 'concat,minify,inline'
+## (optional) static assets folder versioning
+# response.static_version = '0.0.0'
+#########################################################################
+## Here is sample code if you need for
+## - email capabilities
+## - authentication (registration, login, logout, ... )
+## - authorization (role based authorization)
+## - services (xml, csv, json, xmlrpc, jsonrpc, amf, rss)
+## - old style crud actions
+## (more options discussed in gluon/tools.py)
+#########################################################################
+
+##Tablas para la aplicacion
+db.define_table('dependencia',
+                Field('nombre', length=128, notnull=True,
+                      unique=True, ondelete='NO ACTION'),
+                format='%(nombre)s')
+## Esta tabla debe ser llenada por un administrador siempre
+db.dependencia.nombre.writeable = False
+db.dependencia.nombre.represent = lambda nombre, registro: nombre.title()
+
+#from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
+from gluon.tools import Auth, prettydate
+auth = Auth(db)
+#crud, service, plugins = Crud(db), Service(), PluginManager()
+
+## campos extra
+### Agregar en la proxima version la carrera
+auth.settings.extra_fields['auth_user'] = [
+  Field('facultad', 'reference dependencia'),
+  Field('avatar', 'upload', autodelete=True, uploadseparate=True),
+  Field('anonimo', 'boolean', default=True)]
+## create all tables needed by auth if not custom tables
+auth.define_tables(username=False, signature=False)
+
+## configure email
+mail = auth.settings.mailer
+mail.settings.server = 'logging' or 'smtp.gmail.com:587'
+mail.settings.sender = 'you@gmail.com'
+mail.settings.login = 'username:password'
+
+## configure auth policy
+auth.settings.registration_requires_verification = True
+auth.settings.login_after_registration = True
+auth.settings.registration_requires_approval = False
+auth.settings.reset_password_requires_verification = True
+##el grupo por defecto para usuarios tipo 'normal'
+if not db(db.auth_group).count():
+    db.auth_group.insert(id=1, role='administrador', description='Super poderes')
+    db.auth_group.insert(id=2, role='editor',
+                         description='Editar profesores y eliminar comentarios')
+    db.auth_group.insert(id=3, role='normal', description='Usuario común')
+    auth.settings.everybody_group_id = 3
+else:
+    #normal_id = db.auth_group(db.auth_group.role == 'normal').id
+    auth.settings.everybody_group_id = 3
+## usuario anonimo por defecto
+if not db(db.auth_user).count():
+    db.auth_user.insert(id=1, first_name='anónimo', anonimo=True)
+
+auth.settings.login_onaccept.append(lambda form: redirect(URL('pasarela')))
+auth.settings.keep_session_onlogout = True
+auth.settings.formstyle = 'divs'
+
+## if you need to use OpenID, Facebook, MySpace, Twitter, Linkedin, etc.
+## register with janrain.com, write your domain:api_key in private/janrain.key
+from gluon.contrib.login_methods.rpx_account import use_janrain
+use_janrain(auth, filename='private/janrain.key')
+
+## after defining tables, uncomment below to enable auditing
+# auth.enable_record_versioning(db)
+
+db.define_table('profesor',
+                Field('nombre', length=128, notnull=True, unique=True),
+                Field('foto', 'upload', autodelete=True, uploadseparate=True),
+                Field('facultad', 'reference dependencia', ondelete='SET NULL'),
+                Field('slug', compute=lambda r: IS_SLUG()(r.nombre)[0]),
+                format='%(nombre)s')
+## Esta tabla debe ser llenada por un administrador (por ahora)
+db.profesor.nombre.required = True
+db.profesor.nombre.writeable = False
+db.profesor.nombre.represent = lambda nombre, registro: nombre.title()
+db.profesor.foto.writeable = False
+db.profesor.foto.requires = IS_IMAGE(minsize=(100,100))
+db.profesor.facultad.writeable = False
+db.profesor.slug.writeable = False
+
+db.define_table('evaluacion',
+                Field('recomendable', 'boolean',
+                      required=True),
+                Field('evento', length=32),
+                Field('comentario', 'text'),
+                Field('evaluado', 'reference profesor',
+                      notnull=True),
+                Field('evaluador', 'reference auth_user',
+                      default=lambda: auth.user_id or 1),
+                Field('ip', update=request.client),
+                Field('modificado_en', 'datetime', update=request.now),
+                Field('editado', 'boolean', update=True))
+## el campo 'recomendable' se envia como campo oculto
+db.evaluacion.evento.requires = [IS_NOT_EMPTY(), IS_LENGTH(minsize=5,maxsize=32)]
+db.evaluacion.comentario.requires = [IS_NOT_EMPTY(), IS_LENGTH(minsize=8,maxsize=65536)]
+db.evaluacion.evaluado.readeable = False
+db.evaluacion.evaluado.writeable = False
+db.evaluacion.evaluador.readeable = False
+db.evaluacion.evaluador.writeable = False
+db.evaluacion.evaluador.requires = None
+db.evaluacion.ip.readeable = False
+db.evaluacion.ip.writeable = False
+db.evaluacion.modificado_en.writeable = False
+db.evaluacion.editado.writeable = False
+db.evaluacion.editado.readeable = False
+## Eliminar las notas si el usuario actualiza su comentario
+db.evaluacion._after_update.append(
+  lambda s,f: db(db.nota_evaluacion.id_evaluacion == s.query.second).delete())
+
+db.define_table('nota_evaluacion',
+                Field('id_evaluacion', 'reference evaluacion'),
+                Field('id_usuario', 'reference auth_user'),
+                Field('nota', length=16, notnull=True, required=True),
+                Field('creado_en', 'datetime', update=request.now))
+db.nota_evaluacion.id_evaluacion.readeable = False
+db.nota_evaluacion.id_evaluacion.writeable = False
+db.nota_evaluacion.id_usuario.readeable = False
+db.nota_evaluacion.id_usuario.writeable = False
+db.nota_evaluacion.nota.requires = [IS_NOT_EMPTY(), IS_LENGTH(16), IS_IN_SET(['megusta', 'inapropiado'])]
+
+# después de iniciar sessión agregar los comentarios anonimos
+# que se hicieron a su cuenta
+def agregar_comentarios_anonimos(formulario):
+    if session.evaluaciones:
+        for d in session.evaluaciones:
+            if d['importar']:
+                db.evaluacion(d['id_evaluacion']).update_record(evaluador=auth.user_id)
+                d['importar'] = False
+auth.settings.register_onaccept = agregar_comentarios_anonimos
+
+
+# campos virtuales para profesores
+class CamposVirtuales(object):
+    def comentarios(self):
+        return db(db.evaluacion.evaluado==self.profesor.id).count(cache=(cache.ram, 15))
+    def recomendaciones(self):
+        return db((db.evaluacion.evaluado==self.profesor.id) &
+                  (db.evaluacion.recomendable==True)).count(cache=(cache.ram, 15))
+    def top_positivo(self):
+        return db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) &
+                  (db.evaluacion.evaluado==self.profesor.id) &
+                  (db.nota_evaluacion.nota=='megusta') &
+                  (db.evaluacion.recomendable==True)
+                  ).select(db.evaluacion.evento,
+                           db.evaluacion.comentario,
+                           groupby=db.evaluacion.id,
+                           orderby=~db.evaluacion.id.count(),
+                           cache=(cache.ram, 300)
+                           ).first()
+    def top_negativo(self):
+        return db((db.nota_evaluacion.id_evaluacion==db.evaluacion.id) &
+                  (db.evaluacion.evaluado==self.profesor.id) &
+                  (db.nota_evaluacion.nota=='megusta') &
+                  (db.evaluacion.recomendable==False)
+                  ).select(db.evaluacion.evento,
+                           db.evaluacion.comentario,
+                           groupby=db.evaluacion.id,
+                           orderby=~db.evaluacion.id.count(),
+                           cache=(cache.ram, 300)
+                           ).first()
+
+## Las siguientes lineas sirven para configurar una instalacion nueva
+## agregar usuario administrador y configuracion de mail, por ejemplo
+#if not db(db.auth_user).count() and not request.function == 'instalar':
+#    redirect(URL('instalar'))

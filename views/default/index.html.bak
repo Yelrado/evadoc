@@ -1,0 +1,66 @@
+{{
+response.files.append(URL('static','css/owl.carousel.css'))
+response.files.append(URL('static','css/owl.theme.css'))
+}}
+{{extend 'layout.html'}}
+
+<div class="row-fluid">
+    <div class="hero-unit">
+      <h1>{{=request.application.replace('_',' ').title()}}<small class="pull-right">"Revisa, Recomienda"</small></h1>
+      <div id="owl-profesores" class="owl-carousel owl-theme">
+        {{for profesor in profesores:}}
+          <div class="item">
+            <a href={{=URL('profesor', args=profesor.slug)}}>
+              {{=IMG(_class='lazyOwl img-rounded', _alt=profesor.nombre,
+                     **{'_data-src':URL('download', args=profesor.foto)})}}
+            </a>
+            <div class="well well-small text-center">
+              <h4>{{=profesor.nombre.title()}}</h4>
+              <span class="muted small">{{=profesor.facultad.nombre}}</span>
+            </div>
+          </div>
+        {{pass}}
+      </div>
+    </div>
+    <div class="text-center">
+      <p class="lead text-center">Actualmente <span class="text-info"><strong>{{=total}}</strong></span> Profesores a recomendar<br/>
+          <span class="muted">De la {{=response.universidad}}</span></p>
+      {{if not auth.is_logged_in() and not session.id_facultad:}}
+        <a class="btn btn-success btn-large" href="#modalFacultad" data-toggle="modal"><i class="icon-play icon-white"></i> Iniciar</a>
+      {{else:}}
+        <a class="btn btn-success btn-large" href="{{=URL('pasarela')}}" data-toggle="modal"><i class="icon-play icon-white"></i> Iniciar</a>
+      {{pass}}
+    </div>
+</div>
+
+{{block javascript}}
+<script src="{{=URL('static','js/owl.carousel.min.js')}}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    //Sort random function
+    function random(owlSelector){
+        owlSelector.children().sort(function(){
+            return Math.round(Math.random()) - 0.5;
+        }).each(function(){
+            $(this).appendTo(owlSelector);
+        });
+    }
+    $("#owl-profesores").owlCarousel({
+        autoPlay: 2200, //Set AutoPlay to 3 seconds
+        autoHeight: true,
+        itemsScaleUp: true,
+        lazyLoad: true,
+        pagination: false,
+        navigation: true,
+        navigationText: [
+            "<i class='icon-chevron-left icon-white'></i>",
+            "<i class='icon-chevron-right icon-white'></i>"
+        ],
+        beforeInit : function(elem){
+            //Parameter elem pointing to $("#owl-demo")
+            random(elem);
+        }
+    });
+});
+</script>
+{{end}}

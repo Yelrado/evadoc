@@ -1,5 +1,5 @@
 evadoc
 ======
 
-Herramienta para evaluar docentes diseñada para estudiantes. "Analizar, Recomendar".
+Herramienta para evaluar docentes diseñada para estudiantes. "Revisa, Recomienda".
 
